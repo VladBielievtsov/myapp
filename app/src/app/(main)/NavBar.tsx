@@ -5,13 +5,13 @@ import { CircleUserRound, Moon, Soup, Sun, User } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
-import Button from "@/components/ui/Button";
+import Button from "@/components/common/Button";
 import { useThemeStore } from "@/store";
 import {
   DropdownMenu,
   DropdownContent,
   DropdownToggle,
-} from "@/components/ui/DropdownMenu";
+} from "@/components/common/DropdownMenu";
 
 export default function NavBar() {
   const { theme, toggleTheme } = useThemeStore();

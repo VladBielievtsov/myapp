@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Inter } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/store";
@@ -13,6 +13,7 @@ export default function ThemeProvider({
   children: React.ReactNode;
 }>) {
   const { theme } = useThemeStore();
+
   return (
     <html lang="en" data-scroll="0" className={theme}>
       <head>

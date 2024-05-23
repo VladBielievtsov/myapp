@@ -6,6 +6,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
+	"my-app/types"
 	"os"
 )
 
@@ -31,4 +32,12 @@ func CreateDatabase() error {
 	}
 	log.Println("🚀 Connected Successfully to the Database")
 	return nil
+}
+
+func Migrate() {
+	err := DB.AutoMigrate(&types.User{})
+	if err != nil {
+		log.Fatalf("Failed to migrate database: %v", err)
+	}
+	log.Println("Database migrated successfully")
 }

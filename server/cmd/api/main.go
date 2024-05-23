@@ -6,6 +6,7 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"my-app/db"
+	"my-app/handlers"
 	"net/http"
 )
 
@@ -18,11 +19,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	db.Migrate()
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Hello"))
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Get("/user", handlers.GetUsers)
+		r.Post("/user", handlers.StoreUser)
 	})
 
 	err := http.ListenAndServe(":4000", r)

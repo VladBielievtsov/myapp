@@ -1,10 +1,13 @@
 package services
 
 import (
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"my-app/db"
 	"my-app/types"
+	"strings"
+	"time"
 )
 
 type UserService struct{}
@@ -37,7 +40,7 @@ func (s *UserService) CreateUser(req types.CreateUserRequest) (types.User, map[s
 	id := uuid.New()
 	user := types.User{
 		ID:       &id,
-		Username: req.Username,
+		Username: strings.ToLower(req.Username),
 		Password: string(hashedPassword),
 	}
 
@@ -57,4 +60,39 @@ func (s *UserService) GetUserByID(id string) (types.User, map[string]string) {
 	}
 
 	return user, nil
+}
+
+func (s *UserService) Login(req types.LoginUserRequest) (types.User, string, map[string]string) {
+	if req.Username == "" || req.Password == "" {
+		return types.User{}, "", map[string]string{"status": "fail", "message": "Username and password are required"}
+	}
+
+	var user types.User
+	result := db.DB.First(&user, "username = ?", strings.ToLower(req.Username))
+	if result.Error != nil {
+		return types.User{}, "", map[string]string{"status": "fail", "message": "User not found"}
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		if result.Error != nil {
+			return types.User{}, "", map[string]string{"status": "fail", "message": "Invalid password"}
+		}
+	}
+
+	tokenByte := jwt.New(jwt.SigningMethodHS256)
+	now := time.Now().UTC()
+	claims := tokenByte.Claims.(jwt.MapClaims)
+
+	claims["sub"] = user.ID
+	claims["exp"] = now.Add(120 * time.Minute).Unix()
+	claims["iat"] = now.Unix()
+	claims["nbf"] = now.Unix()
+
+	tokenString, err := tokenByte.SignedString([]byte("secret"))
+	if err != nil {
+		return types.User{}, "", map[string]string{"status": "fail", "message": "generating JWT Token failed"}
+	}
+
+	return user, tokenString, nil
 }

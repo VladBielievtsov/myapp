@@ -43,3 +43,8 @@ func FilterUsers(users []User) []UserResponse {
 
 	return filteredUsers
 }
+
+type LoginUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}

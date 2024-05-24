@@ -8,6 +8,7 @@ import (
 	"log"
 	"my-app/db"
 	"my-app/types"
+	"strings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ func seedUsers(quantity int, db *gorm.DB) {
 		id := uuid.New()
 		user := types.User{
 			ID:       &id,
-			Username: id.String(),
+			Username: strings.ToLower(id.String()),
 			Password: "password",
 		}
 

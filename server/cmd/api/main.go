@@ -25,7 +25,14 @@ func main() {
 	r.Use(middleware.Logger)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Hello"))
+		_, err := w.Write([]byte("Hello"))
+		if err != nil {
+			return
+		}
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Post("/login", handlers.Login)
 	})
 
 	r.Group(func(r chi.Router) {

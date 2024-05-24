@@ -2,7 +2,9 @@ package db
 
 import (
 	"fmt"
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
@@ -31,6 +33,32 @@ func CreateDatabase() error {
 		log.Fatal("Failed to connect to the Database! \n", err.Error())
 	}
 	log.Println("🚀 Connected Successfully to the Database")
+
+	var count int64
+	DB.Model(&types.User{}).Count(&count)
+
+	if count == 0 {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte("password"), bcrypt.DefaultCost)
+		if err != nil {
+			panic(err)
+		}
+		id := uuid.New()
+		defaultUser := types.User{
+			ID:       &id,
+			Username: "admin",
+			Password: string(hashedPassword),
+		}
+		result := DB.FirstOrCreate(&types.User{}, defaultUser)
+		if result.Error != nil {
+			panic(result.Error)
+		}
+		fmt.Println("Default user created successfully!")
+		fmt.Println("====================")
+		fmt.Println("Username: admin")
+		fmt.Println("Password: password")
+		fmt.Println("====================")
+	}
+
 	return nil
 }
 

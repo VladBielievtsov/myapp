@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 	"my-app/db"
 	"my-app/types"
 )
@@ -27,11 +28,17 @@ func (s *UserService) CreateUser(req types.CreateUserRequest) (types.User, map[s
 	if req.Username == "" || req.Password == "" {
 		return types.User{}, map[string]string{"status": "fail", "message": "Username and password are required"}
 	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return types.User{}, map[string]string{"status": "fail", "message": "Error during password hashing"}
+	}
+
 	id := uuid.New()
 	user := types.User{
 		ID:       &id,
 		Username: req.Username,
-		Password: req.Password,
+		Password: string(hashedPassword),
 	}
 
 	if err := db.DB.Create(&user).Error; err != nil {

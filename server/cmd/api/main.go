@@ -30,6 +30,7 @@ func main() {
 
 	r.Group(func(r chi.Router) {
 		r.Get("/user", handlers.GetUsers)
+		r.Get("/user/{id}", handlers.GetUser)
 		r.Post("/user", handlers.StoreUser)
 	})
 

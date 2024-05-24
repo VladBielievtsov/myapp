@@ -40,3 +40,14 @@ func (s *UserService) CreateUser(req types.CreateUserRequest) (types.User, map[s
 
 	return user, nil
 }
+
+func (s *UserService) GetUserByID(id string) (types.User, map[string]string) {
+	var user types.User
+
+	result := db.DB.First(&user, "id = ?", id)
+	if result.Error != nil {
+		return types.User{}, map[string]string{"status": "fail", "message": "User not found"}
+	}
+
+	return user, nil
+}

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/go-chi/chi/v5"
 	"my-app/services"
 	"my-app/types"
 	"my-app/utils"
@@ -35,4 +36,16 @@ func StoreUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSONResponse(w, http.StatusCreated, types.FilterUser(&user))
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	user, err := userService.GetUserByID(id)
+	if err != nil {
+		utils.JSONResponse(w, http.StatusNotFound, err)
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, user)
 }

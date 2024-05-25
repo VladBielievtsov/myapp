@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
+	"my-app/middlewares"
 	"my-app/services"
 	"my-app/types"
 	"my-app/utils"
@@ -69,4 +70,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSONResponse(w, http.StatusOK, result)
+}
+
+func GetMe(w http.ResponseWriter, r *http.Request) {
+	user, ok := r.Context().Value(middlewares.AuthContext{}).(types.User)
+	if !ok {
+		utils.JSONResponse(w, http.StatusInternalServerError, map[string]string{"message": "Could not retrieve user from context"})
+		return
+	}
+
+	utils.JSONResponse(w, http.StatusOK, types.FilterUser(&user))
 }

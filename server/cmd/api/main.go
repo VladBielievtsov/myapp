@@ -7,6 +7,7 @@ import (
 	"log"
 	"my-app/db"
 	"my-app/handlers"
+	"my-app/middlewares"
 	"net/http"
 )
 
@@ -32,7 +33,13 @@ func main() {
 	})
 
 	r.Group(func(r chi.Router) {
+		r.Use(middlewares.IsUnauthorized)
 		r.Post("/login", handlers.Login)
+	})
+
+	r.Group(func(r chi.Router) {
+		r.Use(middlewares.AuthMiddleware)
+		r.Get("/me", handlers.GetMe)
 	})
 
 	r.Group(func(r chi.Router) {
